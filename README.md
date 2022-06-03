@@ -1,59 +1,60 @@
 # HPC system administrator tutorial
 
 - [HPC system administrator tutorial](#hpc-system-administrator-tutorial)
-  * [Hardware requirements](#hardware-requirements)
-  * [Useful commands](#useful-commands)
-  * [Vocabulary](#vocabulary)
-    + [Basic concepts](#basic-concepts)
-    + [Basic words](#basic-words)
-    + [Understanding services](#understanding-services)
-    + [Computational resources management](#computational-resources-management)
-  * [Cluster description](#cluster-description)
-    + [Architecture](#architecture)
-    + [Network](#network)
-    + [Final notes before we start](#final-notes-before-we-start)
-  * [Management node installation](#management-node-installation)
-    + [Setup basic repositories](#setup-basic-repositories)
-      - [Main OS](#main-os)
-      - [Other repositories](#other-repositories)
-    + [DHCP server](#dhcp-server)
-    + [DNS server](#dns-server)
-    + [Hosts file](#hosts-file)
-    + [Time server](#time-server)
-    + [PXE stack](#pxe-stack)
-      - [fbtftp module](#fbtftp-module)
-      - [fbtftp custom server](#fbtftp-custom-server)
-      - [iPXE custom rom](#ipxe-custom-rom)
-      - [iPXE chain](#ipxe-chain)
-      - [Kickstart](#kickstart)
-  * [Other nodes installation](#other-nodes-installation)
-    + [Boot over PXE](#boot-over-pxe)
-    + [Configure client side](#configure-client-side)
-      - [Set hostname](#set-hostname)
-      - [Configure repositories](#configure-repositories)
-      - [DNS client](#dns-client)
-      - [Hosts file](#hosts-file-1)
-      - [Time client](#time-client)
-  * [Storage](#storage)
-    + [NFS server](#nfs-server)
-    + [NFS clients](#nfs-clients)
-  * [Slurm](#slurm)
-    + [Controller](#controller)
-    + [Computes nodes](#computes-nodes)
-    + [Submitter](#submitter)
-    + [Submitting jobs](#submitting-jobs)
-      - [Submitting without a script](#submitting-without-a-script)
-      - [Basic job script](#basic-job-script)
-      - [Serial job](#serial-job)
-      - [OpenMP job](#openmp-job)
-      - [MPI job](#mpi-job)
-  * [Users](#users)
-  * [Infiniband](#infiniband)
-  * [GPU (Nvidia)](#gpu--nvidia-)
-    + [Ensure kernel do not crash](#ensure-kernel-do-not-crash)
-    + [Disable nouveau driver](#disable-nouveau-driver)
-    + [Install Nvidia driver](#install-nvidia-driver)
-  * [Conclusion](#conclusion)
+  * [1. Hardware requirements](#1-hardware-requirements)
+  * [2. Useful commands](#2-useful-commands)
+  * [3. Vocabulary](#3-vocabulary)
+    + [3.1. Basic concepts](#31-basic-concepts)
+    + [3.2. Basic words](#32-basic-words)
+    + [3.3. Understanding services](#33-understanding-services)
+    + [3.4. Computational resources management](#34-computational-resources-management)
+  * [4. Cluster description](#4-cluster-description)
+    + [4.1. Architecture](#41-architecture)
+    + [4.2. Network](#42-network)
+    + [4.3. Final notes before we start](#43-final-notes-before-we-start)
+  * [5. Management node installation](#5-management-node-installation)
+    + [5.1. Setup basic    repositories](#51-setup-basic----repositories)
+      - [5.1.1. Main OS](#511-main-os)
+      - [5.1.2. Other repositories](#512-other-repositories)
+    + [5.2. DHCP server](#52-dhcp-server)
+    + [5.3. DNS server](#53-dns-server)
+    + [5.4. Hosts file](#54-hosts-file)
+    + [5.5. Time server](#55-time-server)
+    + [5.6. PXE stack](#56-pxe-stack)
+      - [5.6.1. fbtftp module](#561-fbtftp-module)
+      - [5.6.2. fbtftp custom server](#562-fbtftp-custom-server)
+      - [5.6.3. iPXE custom rom](#563-ipxe-custom-rom)
+      - [5.6.4. iPXE chain](#564-ipxe-chain)
+      - [5.6.5. Kickstart](#565-kickstart)
+  * [6. Other nodes installation](#6-other-nodes-installation)
+    + [6.1. Boot over PXE](#61-boot-over-pxe)
+    + [6.2. Configure client side](#62-configure-client-side)
+      - [6.2.1. Set hostname](#621-set-hostname)
+      - [6.2.2. Configure repositories](#622-configure-repositories)
+      - [6.2.3. DNS client](#623-dns-client)
+      - [6.2.4. Hosts file](#624-hosts-file)
+      - [6.2.5. Time client](#625-time-client)
+  * [7. Storage](#7-storage)
+    + [7.1. NFS server](#71-nfs-server)
+    + [7.2. NFS clients](#72-nfs-clients)
+  * [8. Slurm](#8-slurm)
+    + [8.1. Controller](#81-controller)
+    + [8.2. Computes nodes](#82-computes-nodes)
+    + [8.3. Submitter](#83-submitter)
+    + [8.4. Submitting jobs](#84-submitting-jobs)
+      - [8.4.1. Submitting without a script](#841-submitting-without-a-script)
+      - [8.4.2. Basic job script](#842-basic-job-script)
+      - [8.4.3. Serial job](#843-serial-job)
+      - [8.4.4. OpenMP job](#844-openmp-job)
+      - [8.4.5. MPI job](#845-mpi-job)
+      - [8.4.6. Real life example with Blender job](#846-real-life-example-with-blender-job)
+  * [9. Users](#9-users)
+  * [10. Infiniband](#10-infiniband)
+  * [11. GPU (Nvidia)](#11-gpu--nvidia-)
+    + [11.1. Ensure kernel do not crash](#111-ensure-kernel-do-not-crash)
+    + [11.2. Disable nouveau driver](#112-disable-nouveau-driver)
+    + [11.3. Install Nvidia driver](#113-install-nvidia-driver)
+  * [12. Conclusion](#12-conclusion)
 
 This tutorial tries to teach how to install manually a basic HPC cluster.
 
@@ -64,7 +65,7 @@ web will most of the time solves the issue.
 If you face any issues with this tutorial, do not hesitate to contact me at:
 benoit.leveugle@gmail.com
 
-## Hardware requirements
+## 1. Hardware requirements
 
 The following hardware is needed to perform this training:
 
@@ -77,7 +78,7 @@ Laptop/workstation with 8go or 16go, and 40Go disk. VT-x instructions MUST be ac
 **Best configuration to do the training:**
 A real cluster, with real physical servers.
 
-## Useful commands
+## 2. Useful commands
 
 General commands:
 
@@ -112,9 +113,9 @@ Clush usage :
 * To copy a file on all nodes : `clush -w node1,node[4-5] –copy /root/slurm.conf –dest=/etc/slurm/slurm.conf`
 * To replace a string in a file of all nodes : `clush -bw compute1[34-67] 'sed -i "s/10.0.0.1/nfsserver/g" /etc/fstab'`
 
-## Vocabulary
+## 3. Vocabulary
 
-### Basic concepts
+### 3.1. Basic concepts
 
 Few words on vocabulary used:
 
@@ -133,7 +134,7 @@ Few words on vocabulary used:
 
 An HPC cluster can be seen like a sheep flock. The admin sys (shepherd), the management node (shepherd dog), and the compute/login nodes (sheep). This leads to two types of nodes, like cloud computing: pets (shepherd dog) and cattle (sheep). While the safety of your pets must be absolute for good production, losing cattle is common and considered normal. In HPC, most of the time, management node, file system (io) nodes, etc, are considered as pets. On the other hand, compute nodes and login nodes are considered cattle. Same philosophy apply for file systems: some must be safe, others can be faster but “losable”, and users have to understand it and take precautions. In this tutorial, /home will be considered safe, and /scratch fast but losable.
 
-### Basic words
+### 3.2. Basic words
 
 An HPC cluster is an aggregate of physical compute nodes dedicated to intensive calculations.
 Most of the time, these calculations are related to sciences, but can also be used in other domains, like finances.
@@ -161,7 +162,7 @@ Management node, called here `odin`, is the node hosting most of vital services 
 
 **Interconnect** network, often based on the **InfiniBand** technology (IB), is used in parallel of the Ethernet network (Eth). Interconnect is mainly used for calculations (transfer data between process of running codes) and is used to export the fast file systems, exported by the IO nodes. InfiniBand has much lower latency and much higher bandwidth than Ethernet network.
 
-### Understanding services
+### 3.3. Understanding services
 
 As said above, management node host multiple basic services needed to run the cluster:
 * The **repository** server: based on http protocol, it provides packages (rpm) to all nodes of the cluster. Service is `httpd` (Apache).
@@ -175,7 +176,7 @@ As said above, management node host multiple basic services needed to run the cl
 * The **job scheduler** server: manage computational resources, and spread jobs from users on the cluster. Service is `slurmctld` (Slurm).
 * The **monitoring** server: monitor the cluster to provide metrics, and raise alerts in case of issues. Service is `prometheus` (Prometheus).
 
-### Computational resources management
+### 3.4. Computational resources management
 
 The **job scheduler** is the conductor of computational resources of the cluster.
 
@@ -184,9 +185,9 @@ When a user ask the job scheduler to execute a **job**, which is call **submitti
 The job scheduler is then in charge of finding free computational resources depending of the needs of the job, then launching the job and monitoring it during its execution. Note that the job scheduler is in charge of managing all jobs to ensure maximum usage of computational resources, which is why sometime, the job scheduler will put some jobs on hold for a long time in a queue, to wait for free resources.
 In return, after user has submitted a job, the job scheduler will provide user a **job ID** to allow following job state in the jobs queue and during its execution.
 
-## Cluster description
+## 4. Cluster description
 
-### Architecture
+### 4.1. Architecture
 
 The cluster structure for this training will be as follows:
 
@@ -199,7 +200,7 @@ On the hardware side:
 * One login node called `heimdall` for users to login.
 * Multiple compute nodes, called `valkyries` will then be deployed on the fly with PXE.
 
-### Network
+### 4.2. Network
 
 Network information:
 
@@ -216,7 +217,7 @@ Domain name will be cluster.local
 Note: if you plan to test this tutorial in Virtualbox, 10.10.X.X range may
 already been taken by Virtualbox NAT. In this case, use another subnet.
 
-### Final notes before we start
+### 4.3. Final notes before we start
 
 All nodes will be installed with a minimal install Centos 8. Needed other rpms
 will be created on the fly from sources.
@@ -226,7 +227,7 @@ will be created on the fly from sources.
 * If you get `Pane is dead` error during pxe install, most of the time increase RAM to minimum 1200 Mo and it should be ok.
 * You can edit files using `vim` which is a powerful tool, but if you feel more comfortable with, use `nano` (`nano myfile.txt`, then edit file, then use `Ctrl+O` to save, and `Ctrl+X` to exit).
 
-## Management node installation
+## 5. Management node installation
 
 This part describes how to manually install `odin` management node basic services, needed to deploy and install the other servers.
 
@@ -273,9 +274,9 @@ You should see your NICs with `enp0s8` having ip `10.10.0.1` with `/16` prefix.
 
 Time to setup basic repositories.
 
-### Setup basic	repositories
+### 5.1. Setup basic	repositories
 
-#### Main OS
+#### 5.1.1. Main OS
 
 Backup and clean first default Centos repositories:
 
@@ -372,7 +373,7 @@ dnf repolist
 dnf install wget
 ```
 
-#### Other repositories
+#### 5.1.2. Other repositories
 
 We will need to add extra packages as not all is contained in the Centos 8 DVD.
 Create extra repository folder:
@@ -425,7 +426,7 @@ Also, install clustershell and ipmitool, these will be used for computes nodes d
 dnf install clustershell ipmitool
 ```
 
-### DHCP server
+### 5.2. DHCP server
 
 The DHCP server is used to assign ip addresses and hostnames to other nodes. It is the first server seen by a new node booting in PXE for installation. In this configuration, it is assumed MAC addresses of nodes are known.
 
@@ -512,7 +513,7 @@ nmap 10.10.254.0-254
 
 This is useful to check after a cluster installation that no equipment connected on the network was forgotten in the process.
 
-### DNS server
+### 5.3. DNS server
 
 DNS server provides on the network ip/hostname relation to all hosts:
 
@@ -681,7 +682,7 @@ Use `-i` to unlock it later.
 DNS is now ready. You can try to ping `odin` and see if it works.
 Stop DNS service and try again to see it does not resolve ip anymore.
 
-### Hosts file
+### 5.4. Hosts file
 
 An alternative or in complement to DNS, most system administrators setup an hosts file.
 
@@ -703,7 +704,7 @@ Lets create our hosts file. Edit `/etc/hosts` file and have it match the followi
 
 You can now try to stop DNS server and check that now, even with the DNS stopped, we can resolve and ping `odin`.
 
-### Time server
+### 5.5. Time server
 
 The time server provides date and time to ensure all nodes/servers are synchronized. This is VERY important, as many authentication tools (munge, ldap, etc.) will not work if cluster is not clock synchronized. If something fail to authenticate, one of the first debug move is to check clock are synchronized.
 
@@ -745,10 +746,10 @@ Then start and enable service:
 
 ```
 systemctl restart chronyd
-systemctl enable chornyd
+systemctl enable chronyd
 ```
 
-### PXE stack
+### 5.6. PXE stack
 
 PXE, for Preboot Execution Environment, is a mechanism that allows remote hosts to boot from the network and deploy operating system using configuration and packages from the management node.
 
@@ -758,22 +759,22 @@ The http server will distribute the minimal kernel and initramfs for remote Linu
 
 Note that the Centos already embed a very basic tftp server. But it cannot handle an HPC cluster load, and so we replace it by the Facebook python based tftp server.
 
-#### fbtftp module
+#### 5.6.1. fbtftp module
 
 Lets grab python module first:
 
 ```
-mkdir fbtftp-0.4
-cd fbtftp-0.4
+mkdir fbtftp-0.5
+cd fbtftp-0.5
 dnf install git tar rpm-build
 git clone https://github.com/facebook/fbtftp.git .
 python3 setup.py bdist_rpm --spec-only
 cd ../
-tar cvzf fbtftp-0.4.tar.gz fbtftp-0.4
-rpmbuild -ta fbtftp-0.4.tar.gz
+tar cvzf fbtftp-0.5.tar.gz fbtftp-0.5
+rpmbuild -ta fbtftp-0.5.tar.gz
 ```
 
-#### fbtftp custom server
+#### 5.6.2. fbtftp custom server
 
 Now create a custom tftp server based on fbtftp. Create first needed folders:
 
@@ -990,7 +991,7 @@ rpmbuild -ta fbtftp_server-0.1.tar.gz --target=noarch
 Copy both packages into our extra repository, update the repository:
 
 ```
-cp /root/rpmbuild/RPMS/noarch/fbtftp-0.4-1.noarch.rpm /var/www/html/repositories/centos/8/x86_64/extra/
+cp /root/rpmbuild/RPMS/noarch/fbtftp-0.5-1.noarch.rpm /var/www/html/repositories/centos/8/x86_64/extra/
 cp /root/rpmbuild/RPMS/noarch/fbtftp_server-0.1-1.el8.noarch.rpm /var/www/html/repositories/centos/8/x86_64/extra/
 createrepo /var/www/html/repositories/centos/8/x86_64/extra/
 dnf clean all
@@ -1002,7 +1003,7 @@ Now install both packages:
 dnf install fbtftp_server -y
 ```
 
-#### iPXE custom rom
+#### 5.6.3. iPXE custom rom
 
 We then need ipxe files. We could use native syslinux or shim.efi files, but this is just not flexible enough for new generation HPC clusters.
 Also, ipxe files provided by Centos are way too old. We will build them ourselves, and include our own init script.
@@ -1109,7 +1110,7 @@ systemctl start fbtftp_server
 systemctl enable fbtftp_server
 ```
 
-#### iPXE chain
+#### 5.6.4. iPXE chain
 
 Now we will create file `/var/www/html/boot.ipxe` that will be targeted by each node booting.
 There are multiple strategy here. We could simply add basic boot information in this file and consider it done.
@@ -1182,7 +1183,7 @@ and create the link from here with a relative path.
 
 To summarize, chain will be the following: `DHCP -> {undionly.kpxe|ipxe.efi} -> boot.ipxe -> thor.ipxe (group_storage.ipxe)` .
 
-#### Kickstart
+#### 5.6.5. Kickstart
 
 We now need to provide a kickstart file.
 
@@ -1303,9 +1304,9 @@ systemctl enable fbtftp_server
 
 We can proceed with the boot of `thor` node, and then the other nodes.
 
-## Other nodes installation
+## 6. Other nodes installation
 
-### Boot over PXE
+### 6.1. Boot over PXE
 
 Open 2 shell on `odin`. In the first one, launch watch logs of dhcp and tftp server using:
 
@@ -1331,13 +1332,13 @@ Note: if you let nodes boot over PXE after reboot, they will again deploy, and e
 There are strategy to solve that automatically, but this is out of the scope of this training. For now, simply change boot order after os deployment.
 
 
-### Configure client side
+### 6.2. Configure client side
 
 Now that other nodes are deployed and reachable over ssh, it is time to configure client side on them.
 
 We will use clustershell (clush) a lot, as it allows to manipulate a lot of hosts over ssh at the same time.
 
-#### Set hostname
+#### 6.2.1. Set hostname
 
 Set hostname on each nodes using the following command (tuned for each nodes of course):
 
@@ -1345,7 +1346,7 @@ Set hostname on each nodes using the following command (tuned for each nodes of 
 hostnamectl set-hostname thor.cluster.local
 ```
 
-#### Configure repositories
+#### 6.2.2. Configure repositories
 
 You need the nodes be able to grab packages from `odin`.
 
@@ -1402,7 +1403,7 @@ clush -bw thor,heimdall,valkyrie[01-02] 'dnf update -y'
 clush -bw thor,heimdall,valkyrie[01-02] 'dnf install wget -y'
 ```
 
-#### DNS client
+#### 6.2.3. DNS client
 
 IF not already automatically done from DHCP, on each client node, set `odin` as default DNS server, by updating `/etc/resolv.conf` file with the following content:
 
@@ -1411,7 +1412,7 @@ search cluster.local
 nameserver 10.10.0.1
 ```
 
-#### Hosts file
+#### 6.2.4. Hosts file
 
 On each client, edit `/etc/hosts` file and have it match the following:
 
@@ -1428,7 +1429,7 @@ On each client, edit `/etc/hosts` file and have it match the following:
 
 You can also simply upload the file from `odin` on clients, using clush.
 
-#### Time client
+#### 6.2.5. Time client
 
 On each client, ensure time server is `odin` sp that our cluster is time synchronised.
 
@@ -1503,12 +1504,12 @@ Again, you can use clush to do all these tasks in parallel on all client nodes.
 
 Our nodes are now configured with the very basic needs. Time to focus on storage.
 
-## Storage
+## 7. Storage
 
 Storage is hosted on `thor`. We will share `/home` and `/software` from this server.
 Then we will mount these directories on the login node `heimdall` and computes nodes `valkyrie01,valkyrie02`.
 
-### NFS server
+### 7.1. NFS server
 
 Ssh on `thor`.
 
@@ -1556,7 +1557,7 @@ showmount -e thor
 
 You should see the exports available on this server.
 
-### NFS clients
+### 7.2. NFS clients
 
 Ssh on `heimdall`.
 
@@ -1590,7 +1591,7 @@ And ensure they are mounted using `df` command.
 Redo these client steps on all other clients, so computes nodes `valkyrie01,valkyrie02`,
 so that the exported folders are available on each nodes where users interact.
 
-## Slurm
+## 8. Slurm
 
 Let's install now the cluster job scheduler, Slurm.
 
@@ -1638,7 +1639,7 @@ Tip: if anything goes wrong with slurm, proceed as following:
 2. Ensure munge daemon is started, and that munge key is the same on all hosts (check md5sum for example).
 3. Stop slurmctld and stop slurmd daemons, and start them in two different shells manually in debug + verbose mode: `slurmctld -D -vvvvvvv` in shell 1 on controller server, and `slurmd -D -vvvvvvv` in shell 2 on compute node.
 
-### Controller
+### 8.1. Controller
 
 Install munge needed packages:
 
@@ -1736,7 +1737,7 @@ systemctl enable slurmctld
 
 Using `sinfo` command, you should now see the cluster start, with both computes nodes down for now.
 
-### Computes nodes
+### 8.2. Computes nodes
 
 On both `valkyrie01,valkyrie02` nodes, install munge the same way than on controller.
 
@@ -1804,7 +1805,7 @@ valkyrie01.cluster.local
 [root@odin ~]#
 ```
 
-### Submitter
+### 8.3. Submitter
 
 Last step to deploy slurm is to install the login node, `heimdall`, that will act as
 a submitter.
@@ -1847,7 +1848,7 @@ Nothing to start here, you can test `sinfo` command from `heimdall` to ensure it
 
 Slurm cluster is now ready.
 
-### Submitting jobs
+### 8.4. Submitting jobs
 
 To execute calculations on the cluster, users will rely on Slurm to submit jobs and get calculation resources.
 Submit commands are `srun` and `sbatch`.
@@ -1868,7 +1869,16 @@ A calculation node is composed of multiple calculation cores. When asking for re
 n=N*ntasks-per-node
 ```
 
-#### Submitting without a script
+Here, we will see the following submittion ways:
+
+1. Submitting without a script
+2. Submitting a basic job script
+3. Submitting a serial job script
+4. Submitting an OpenMP job script
+5. Submitting an MPI job script
+6. A real life example with submitting a 3D animation render on a cluster combining Blender and Slurm arrays.
+
+#### 8.4.1. Submitting without a script
 
 It is possible to launch a very simple job without a script, using the `srun` command. To do that, use `srun` directly, specifying the number of nodes required. For example:
 
@@ -1891,7 +1901,7 @@ valkyrie02
 
 Using this method is a good way to test cluster, or compile code on compute nodes directly, or just use the compute and memory capacity of a node to do simple tasks on it.
 
-#### Basic job script
+#### 8.4.2. Basic job script
 
 To submit a basic job scrip, user needs to use `sbatch` command and provides it a script to execute which contains at the beginning some Slurm information.
 
@@ -1952,7 +1962,7 @@ squeue -u myuser
 
 In this example, execution results will be written by Slurm into `myjob.out.91487` and `myjob.err.91487`.
 
-#### Serial job
+#### 8.4.3. Serial job
 
 To launch a very basic serial job, use the following template as a script for `sbatch`:
 
@@ -1977,7 +1987,7 @@ date
 echo "############### "
 ```
 
-#### OpenMP job
+#### 8.4.4. OpenMP job
 
 To launch an OpenMP job (with multithreads), assuming the code was compiled with openmp flags, use:
 
@@ -2009,7 +2019,7 @@ echo "############### "
 
 Note that it is assumed here that a node has 24 cores.
 
-#### MPI job
+#### 8.4.5. MPI job
 
 To submit an MPI job, assuming the code was parallelized with MPI and compile with MPI, use (note the `srun`, replacing the `mpirun`):
 
@@ -2036,7 +2046,90 @@ echo "############### "
 
 `srun` will act as `mpirun`, but providing automatically all already tuned arguments for the cluster.
 
-## Users
+#### 8.4.6. Real life example with Blender job
+
+Blender animations/movies are render using CPU and GPU. In this tutorial, we will focus on CPU since we do not have GPU (or if you have, lucky you).
+
+We will render an animation of 40 frames.
+
+We could create a simple job, asking Blender to render this animation. But Blender will then use a single compute node. We have a cluster at disposal, lets take advantage of that.
+
+We will use Slurm job arrays (so an array of jobs) to split these 40 frames into chuck of 5 frames. Each chuck will be a unique job. Using this method, we will use all available computes nodes of our small cluster.
+
+Note that 5 is an arbitrary number, and this depend of how difficult to render each frame is. If a unique frame takes 10 minutes to render, then you can create chink of 1 frame. If on the other hand each frame takes 10s to render, it is better to group them by chunk as Blender as a "starting time" for each new chunk.
+
+First download Blender and the demo:
+
+```
+wget https://download.blender.org/demo/geometry-nodes/candy_bounce_geometry-nodes_demo.blend
+wget https://ftp.nluug.nl/pub/graphics/blender/release/Blender2.93/blender-2.93.1-linux-x64.tar.xz
+```
+
+Extract Blender into `/software` and copy demo file into `/home`:
+
+```
+cp candy_bounce_geometry-nodes_demo.blend /home
+tar xJvf blender-2.93.1-linux-x64.tar.xz -C /software
+```
+
+Now lets create the job file. Create file `/home/blender_job.job` with the following content:
+
+```
+#!/bin/bash
+#SBATCH -J myjob
+#SBATCH -o myjob.out.%j
+#SBATCH -e myjob.err.%j
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=1
+#SBATCH --exclusive
+#SBATCH -t 01:00:00
+
+set -x
+
+# We set chunk size to 5 frames
+chunk_size=5
+
+# We calculate frames span for each job depending of ARRAY_TASK_ID
+range_min=$(((SLURM_ARRAY_TASK_ID-1)*chunk_size+1))
+range_max=$(((SLURM_ARRAY_TASK_ID)*chunk_size))
+
+# We include blender binary into our PATH
+export PATH=/software/blender-2.93.1-linux-x64/:$PATH
+
+# We start the render
+# -b is the input blender file
+# -o is the output target folder, with files format
+# -F is the output format
+# -f specify the range
+# -noaudio is self explaining
+# IMPORTANT: Blender arguments must be given in that specific order.
+
+eval blender -b /home/candy_bounce_geometry-nodes_demo.blend -o /home/frame##### -F PNG -f $range_min..$range_max -noaudio
+
+# Note: if you have issues with default engine, try using CYCLES. Slower.
+# eval blender -b /home/candy_bounce_geometry-nodes_demo.blend -E CYCLES -o /home/frame##### -F PNG -f $range_min..$range_max -noaudio
+
+```
+
+This job file will be executed for each job.
+Since we have 40 frames to render, and we create 5 frames chunk, this means we need to ask Slurm to create a job array of `40/5=8` jobs.
+
+Launch the array of jobs:
+
+```
+sbatch --array=1-8 /home/blender_job.job
+```
+
+If all goes well, using `squeue` command, you should be able to see the jobs currently running, and the ones currently pending for resources.
+
+You can follow jobs by watching their job file (refreshed by Slurm regularly).
+And after few seconds/minutes depending of your hardware, you should see first animation frames as PNG images in /home folder.
+
+![Animation](resources/animation.gif)
+
+This example shows how to use Slurm to create a Blender render farm.
+
+## 9. Users
 
 To have users on the cluster, you need to have the users registered on each node, with same pid and same group gid.
 
@@ -2067,7 +2160,7 @@ Also, use number above 2000 to avoid issues or conflict with possible system ids
 It is important to understand that using manual methods to add users may seems simple, but has a major drawback: the cluster can quickly become out of synchronization regarding users.
 To prevent that, you can create scripts, rely on automation tools like Ansible, or use a centralized users database (OpenLDAP, etc.).
 
-## Infiniband
+## 10. Infiniband
 
 If you need InfiniBand support on nodes, simply install the package group related:
 
@@ -2084,7 +2177,7 @@ systemctl enable rdma
 
 You should now see the ib0 interface in the NIC list from `ip a`.
 
-## GPU (Nvidia)
+## 11. GPU (Nvidia)
 
 To setup an GPU, you need to:
 
@@ -2096,9 +2189,9 @@ You can then install CUDA build and runtime environment on a shared space, or on
 
 Lets do that step by step.
 
-### Ensure kernel do not crash
+### 11.1. Ensure kernel do not crash
 
-To prevent kernel from crashing at boot (Kernel Panic) due to too recent GPU hardware, edit the ipxe file that contains the kernel line 
+To prevent kernel from crashing at boot (Kernel Panic) due to too recent GPU hardware, edit the ipxe file that contains the kernel line
 (for example file `/var/www/html/nodes_groups/group_compute_gpu.ipxe` and append `nomodeset` to the kernel line. For example:
 
 ```
@@ -2140,7 +2233,7 @@ bootloader --append="nomodeset" --location=mbr
 
 Node should not crash anymore.
 
-### Disable nouveau driver
+### 11.2. Disable nouveau driver
 
 Again, redo the same process than before, but add another kernel parameter: `modprobe.blacklist=nouveau nouveau.modeset=0 rd.driver.blacklist=nouveau`
 
@@ -2184,7 +2277,7 @@ bootloader --append="nomodeset modprobe.blacklist=nouveau nouveau.modeset=0 rd.d
 
 Now, node will boot without `nouveau` driver loaded.
 
-### Install Nvidia driver
+### 11.3. Install Nvidia driver
 
 Grab driver from Nvidia website, that match your hardware and Linux distribution (and arch).
 
@@ -2215,7 +2308,7 @@ dnf clean all
 dnf -y module install nvidia-driver:latest-dkms
 ```
 
-## Conclusion
+## 12. Conclusion
 
 The cluster is ready to be used.
 
@@ -2228,6 +2321,7 @@ Additional task could be done:
 * Etc.
 
 If you wish to learn Ansible, to automate all of this, I made another tutorial for that here: http://bluebanquise.com/documentation/learn_ansible.html
+Just keep in mind that hostnames in this Ansible tutorial are different (odin -> management1, etc). So update according to your needs.
 
 You can also rely on an opensource Stack that provides all of this.
 Of course, I will recommended BlueBanquise, https://github/bluebanquise/bluebanquise, but many other stacks exist.
